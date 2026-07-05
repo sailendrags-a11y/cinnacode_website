@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Cinnacode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  .admin-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 40px; }
+  .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .stat-value { font-size: 24px; font-weight: 800; }
+
+  .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 24px; }
+  .filter-field { display: flex; flex-direction: column; gap: 6px; }
+  .filter-field label { font-size: 11px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
+  .filter-field input, .filter-field select {
+    padding: 9px 12px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 6px; color: var(--text); font-size: 13px; font-family: 'Inter', sans-serif;
+  }
+  .filter-field input:focus, .filter-field select:focus { outline: none; border-color: var(--accent-solid); }
+  .btn-filter {
+    padding: 9px 18px; background: var(--accent-solid); color: #1A1006; border: none;
+    border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;
+  }
+  .btn-clear {
+    padding: 9px 18px; background: transparent; border: 1px solid var(--line); color: var(--text-dim);
+    border-radius: 6px; font-size: 13px; cursor: pointer;
+  }
+
+  .admin-table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; font-size: 13px; }
+  .admin-table th { text-align: left; padding: 12px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); border-bottom: 1px solid var(--line); background: var(--panel-2); }
+  .admin-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--text-dim); vertical-align: middle; }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table .cell-name { color: var(--text); font-weight: 500; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+  .badge-active { background: rgba(95,203,142,0.15); color: var(--success); }
+  .badge-suspended { background: rgba(240,101,74,0.15); color: var(--error); }
+  .badge-admin { background: rgba(255,138,80,0.15); color: var(--accent-solid); margin-left: 6px; }
+
+  .btn-action {
+    padding: 6px 14px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; border: none;
+  }
+  .btn-suspend { background: rgba(240,101,74,0.15); color: var(--error); }
+  .btn-suspend:hover { background: rgba(240,101,74,0.25); }
+  .btn-activate { background: rgba(95,203,142,0.15); color: var(--success); }
+  .btn-activate:hover { background: rgba(95,203,142,0.25); }
+  .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px; color: var(--text-dim); }
+  .pagination button {
+    padding: 7px 14px; background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    border-radius: 6px; font-size: 13px; cursor: pointer;
+  }
+  .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .access-denied { text-align: center; padding: 100px 20px; color: var(--text-dim); }
+  .loading-row td { text-align: center; padding: 40px; color: var(--text-faint); font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="site-nav">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span>Cinnacode</a>
+    <div class="nav-links">
+      <span style="color: var(--accent-solid);">// Admin</span>
+    </div>
+    <a href="dashboard.html" class="nav-cta" style="background:transparent;border:1px solid var(--line);color:var(--text-dim);">Back to dashboard</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <section class="legal-page" id="accessDeniedSection" style="display: none;">
+    <div class="access-denied">
+      <div class="section-label">// access denied</div>
+      <h1>Admin access required</h1>
+      <p style="margin-top: 12px;">Your account doesn't have admin permissions. If you believe this is a mistake, contact support.</p>
+    </div>
+  </section>
+
+  <section class="legal-page" id="adminSection" style="display: none;">
+    <div class="section-label">// user management</div>
+    <h1>Admin</h1>
+
+    <div class="admin-stats" id="statsRow" style="margin-top: 32px;">
+      <div class="stat-card"><div class="stat-label">Total users</div><div class="stat-value" id="statTotal">—</div></div>
+      <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" id="statActive">—</div></div>
+      <div class="stat-card"><div class="stat-label">Suspended</div><div class="stat-value" id="statSuspended">—</div></div>
+      <div class="stat-card"><div class="stat-label">Guest accounts</div><div class="stat-value" id="statGuest">—</div></div>
+      <div class="stat-card"><div class="stat-label">GitHub accounts</div><div class="stat-value" id="statGithub">—</div></div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-field">
+        <label>Search (email/username)</label>
+        <input type="text" id="filterSearch" placeholder="e.g. sailendra">
+      </div>
+      <div class="filter-field">
+        <label>Registered from</label>
+        <input type="date" id="filterStartDate">
+      </div>
+      <div class="filter-field">
+        <label>Registered to</label>
+        <input type="date" id="filterEndDate">
+      </div>
+      <div class="filter-field">
+        <label>Status</label>
+        <select id="filterStatus">
+          <option value="">All</option>
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+        </select>
+      </div>
+      <button class="btn-filter" onclick="applyFilters()">Apply</button>
+      <button class="btn-clear" onclick="clearFilters()">Clear</button>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Type</th>
+          <th>Credits</th>
+          <th>Status</th>
+          <th>Registered</th>
+          <th>Last login</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody">
+        <tr class="loading-row"><td colspan="8">// loading users...</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <div id="paginationInfo">—</div>
+      <div style="display: flex; gap: 8px;">
+        <button id="prevPageBtn" onclick="changePage(-1)">← Previous</button>
+        <button id="nextPageBtn" onclick="changePage(1)">Next →</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
+  const token = localStorage.getItem('cinnacode_token');
+  const PAGE_SIZE = 50;
+  let currentOffset = 0;
+  let currentTotal = 0;
+
+  if (!token) {
+    window.location.href = 'login.html';
+  }
+
+  function authHeaders() {
+    return { 'Authorization': `Bearer ${token}` };
+  }
+
+  async function init() {
+    try {
+      const statsRes = await fetch(`${BACKEND_URL}/admin/stats`, { headers: authHeaders() });
+
+      if (statsRes.status === 403) {
+        document.getElementById('accessDeniedSection').style.display = 'block';
+        return;
+      }
+      if (statsRes.status === 401) {
+        localStorage.removeItem('cinnacode_token');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const stats = await statsRes.json();
+      document.getElementById('statTotal').textContent = stats.total_users.toLocaleString();
+      document.getElementById('statActive').textContent = stats.active_users.toLocaleString();
+      document.getElementById('statSuspended').textContent = stats.suspended_users.toLocaleString();
+      document.getElementById('statGuest').textContent = stats.guest_accounts.toLocaleString();
+      document.getElementById('statGithub').textContent = stats.github_accounts.toLocaleString();
+
+      document.getElementById('adminSection').style.display = 'block';
+      loadUsers();
+
+    } catch (err) {
+      document.getElementById('usersTableBody').innerHTML =
+        `<tr class="loading-row"><td colspan="8">// error loading admin panel: ${err.message}</td></tr>`;
+    }
+  }
+
+  function buildQuery() {
+    const params = new URLSearchParams();
+    params.set('limit', PAGE_SIZE);
+    params.set('offset', currentOffset);
+
+    const search = document.getElementById('filterSearch').value.trim();
+    const startDate = document.getElementById('filterStartDate').value;
+    const endDate = document.getElementById('filterEndDate').value;
+    const status = document.getElementById('filterStatus').value;
+
+    if (search) params.set('search', search);
+    if (startDate) params.set('start_date', startDate);
+    if (endDate) params.set('end_date', endDate);
+    if (status) params.set('status', status);
+
+    return params.toString();
+  }
+
+  async function loadUsers() {
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="8">// loading users...</td></tr>';
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/users?${buildQuery()}`, { headers: authHeaders() });
+      if (!response.ok) throw new Error('Could not load users');
+
+      const data = await response.json();
+      currentTotal = data.total;
+
+      if (data.users.length === 0) {
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="8">No users match these filters.</td></tr>';
+      } else {
+        tbody.innerHTML = '';
+        data.users.forEach(u => {
+          const row = document.createElement('tr');
+          const registeredDate = u.created_at ? new Date(u.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+          const lastLogin = u.last_login_at ? new Date(u.last_login_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+          const accountType = u.id.startsWith('guest_') ? 'Guest' : 'GitHub';
+          const statusBadge = u.is_active
+            ? '<span class="badge badge-active">Active</span>'
+            : '<span class="badge badge-suspended">Suspended</span>';
+          const adminBadge = u.is_admin ? '<span class="badge badge-admin">Admin</span>' : '';
+          const actionBtn = u.is_active
+            ? `<button class="btn-action btn-suspend" onclick="suspendUser('${u.id}')">Suspend</button>`
+            : `<button class="btn-action btn-activate" onclick="activateUser('${u.id}')">Activate</button>`;
+
+          row.innerHTML = `
+            <td class="cell-name">${u.name || u.login}${adminBadge}</td>
+            <td>${u.email || '—'}</td>
+            <td>${accountType}</td>
+            <td class="mono">${u.credits_balance.toLocaleString()}</td>
+            <td>${statusBadge}</td>
+            <td>${registeredDate}</td>
+            <td>${lastLogin}</td>
+            <td>${actionBtn}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      const showingFrom = currentTotal === 0 ? 0 : currentOffset + 1;
+      const showingTo = Math.min(currentOffset + PAGE_SIZE, currentTotal);
+      document.getElementById('paginationInfo').textContent = `Showing ${showingFrom}–${showingTo} of ${currentTotal}`;
+      document.getElementById('prevPageBtn').disabled = currentOffset === 0;
+      document.getElementById('nextPageBtn').disabled = currentOffset + PAGE_SIZE >= currentTotal;
+
+    } catch (err) {
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="8">// error: ${err.message}</td></tr>`;
+    }
+  }
+
+  function applyFilters() {
+    currentOffset = 0;
+    loadUsers();
+  }
+
+  function clearFilters() {
+    document.getElementById('filterSearch').value = '';
+    document.getElementById('filterStartDate').value = '';
+    document.getElementById('filterEndDate').value = '';
+    document.getElementById('filterStatus').value = '';
+    currentOffset = 0;
+    loadUsers();
+  }
+
+  function changePage(direction) {
+    currentOffset += direction * PAGE_SIZE;
+    if (currentOffset < 0) currentOffset = 0;
+    loadUsers();
+  }
+
+  async function suspendUser(userId) {
+    if (!confirm('Suspend this user? They will immediately lose access to Cinnacode.')) return;
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/users/${userId}/suspend`, {
+        method: 'POST',
+        headers: authHeaders()
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Could not suspend user');
+      }
+      loadUsers();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function activateUser(userId) {
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/users/${userId}/activate`, {
+        method: 'POST',
+        headers: authHeaders()
+      });
+      if (!response.ok) throw new Error('Could not activate user');
+      loadUsers();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  init();
+</script>
+
+</body>
+</html>
