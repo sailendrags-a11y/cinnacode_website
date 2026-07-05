@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logging you in — Cinnacode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="form-main">
+  <div class="panel" style="text-align: center;">
+    <div class="section-label">// logging you in</div>
+    <h1 id="statusHeading">One moment...</h1>
+    <p class="sub" id="statusText">Completing your GitHub login.</p>
+  </div>
+</main>
+
+<script>
+  // This page exists purely to catch the redirect from the backend's
+  // GitHub OAuth callback (which arrives as ?token=...), store that token,
+  // and hand off to the dashboard — the user never has to see or copy
+  // anything manually, unlike the VS Code extension's login flow.
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+
+  if (token) {
+    localStorage.setItem('cinnacode_token', token);
+    window.location.href = 'dashboard.html';
+  } else {
+    document.getElementById('statusHeading').textContent = 'Login failed';
+    document.getElementById('statusText').innerHTML =
+      'No access token was received. <a href="login.html">Try logging in again</a>.';
+  }
+</script>
+
+</body>
+</html>

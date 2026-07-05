@@ -34,18 +34,16 @@
   <div class="panel">
     <div class="section-label">// log in</div>
     <h1>Welcome back</h1>
-    <p class="sub">Enter the email you registered with to access your dashboard.</p>
+    <p class="sub">Log in with GitHub to access your dashboard, credit balance, and usage history.</p>
 
     <div class="error-box" id="errorBox"></div>
 
-    <form id="loginForm">
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="you@example.com" required>
+    <button id="githubLoginBtn" class="btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      Continue with GitHub
+    </button>
 
-      <button type="submit" class="btn-primary" id="submitBtn" style="width: 100%;">Log in</button>
-    </form>
-
-    <p class="terms-note">New here? <a href="register.html">Create an account</a> instead.</p>
+    <p class="terms-note">New here? <a href="register.html">Create an account</a> instead — no card required, 200 free credits.</p>
   </div>
 </main>
 
@@ -75,44 +73,32 @@
     window.location.href = 'dashboard.html';
   }
 
-  const form = document.getElementById('loginForm');
+  const githubLoginBtn = document.getElementById('githubLoginBtn');
   const errorBox = document.getElementById('errorBox');
-  const submitBtn = document.getElementById('submitBtn');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  githubLoginBtn.addEventListener('click', async () => {
+    githubLoginBtn.disabled = true;
     errorBox.style.display = 'none';
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Logging in...';
 
-    const email = document.getElementById('email').value.trim();
+    // Tell the backend this login is coming from the website, and exactly
+    // which site to redirect back to once GitHub auth completes — this
+    // works correctly whether we're on the temporary GitHub Pages URL or
+    // the real cinnacode.com domain, since it's computed at click time
+    // rather than hardcoded.
+    const siteBase = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+    const statePayload = 'web|' + siteBase;
 
     try {
-      // Note: this calls the same guest-register endpoint the signup page
-      // uses. If the email matches an existing account, the backend
-      // returns that account's existing token (a real login). If the
-      // email has never been used before, it will create a new guest
-      // account rather than reject the login — there's no separate
-      // "account not found" state in the current backend.
-      const response = await fetch(`${BACKEND_URL}/auth/guest/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: email.split('@')[0], email, country: 'India' })
-      });
-
+      const response = await fetch(`${BACKEND_URL}/auth/github/login?state=${encodeURIComponent(statePayload)}`);
       if (!response.ok) {
-        throw new Error('Could not log in right now. Please try again.');
+        throw new Error('Could not start GitHub login.');
       }
-
       const data = await response.json();
-      localStorage.setItem('cinnacode_token', data.access_token);
-      window.location.href = 'dashboard.html';
-
+      window.location.href = data.url;
     } catch (err) {
       errorBox.textContent = err.message || 'Something went wrong. Please try again.';
       errorBox.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Log in';
+      githubLoginBtn.disabled = false;
     }
   });
 </script>
