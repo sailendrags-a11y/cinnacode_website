@@ -80,6 +80,16 @@
         </div>
       </div>
 
+      <div class="section-label">// your access key</div>
+      <div class="key-box" style="margin-bottom: 40px;">
+        <div class="key-label">Use this to log in from VS Code</div>
+        <div class="key-value" id="dashKeyValue">—</div>
+        <button class="copy-btn" id="dashCopyBtn" onclick="copyDashKey()">Copy key</button>
+        <p style="font-size: 13px; color: var(--text-dim); margin-top: 14px; margin-bottom: 0;">
+          Install Cinnacode from the Marketplace, run <code class="mono">AI: Login with GitHub</code> from the command palette, and paste this key when prompted.
+        </p>
+      </div>
+
       <div class="section-label">// usage history</div>
       <div id="historyContainer">
         <table class="history-table" id="historyTable" style="display: none;">
@@ -146,6 +156,20 @@
       const displayName = payload.name || payload.login || 'your account';
       document.getElementById('loggedInName').textContent = displayName;
     }
+    // The key is just the raw token already sitting in localStorage — same
+    // value shown once at registration, now always retrievable here too.
+    document.getElementById('dashKeyValue').textContent = token;
+  }
+
+  function copyDashKey() {
+    navigator.clipboard.writeText(token);
+    const btn = document.getElementById('dashCopyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy key';
+      btn.classList.remove('copied');
+    }, 2000);
   }
 
   // No token at all — this page requires an account, send to registration
