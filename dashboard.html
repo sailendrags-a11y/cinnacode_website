@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Cinnacode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- Google Analytics (GA4) — codesail.in/cinnacode.com property -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8H9819QR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RJ8H9819QR');
+</script>
+<style>
+  /* Dashboard-specific additions, kept local since only this page needs them */
+  .dash-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px; margin-bottom: 40px; }
+  .dash-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+  .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 24px; }
+  .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .stat-value { font-size: 28px; font-weight: 800; }
+  .stat-value.accent { color: var(--accent-solid); }
+  .history-table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .history-table th { text-align: left; padding: 14px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); border-bottom: 1px solid var(--line); background: var(--panel-2); }
+  .history-table td { padding: 14px 20px; font-size: 14px; border-bottom: 1px solid var(--line); color: var(--text-dim); }
+  .history-table tr:last-child td { border-bottom: none; }
+  .history-table .amount-positive { color: var(--success); font-family: 'IBM Plex Mono', monospace; }
+  .history-table .amount-negative { color: var(--text); font-family: 'IBM Plex Mono', monospace; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+  .loading-state { text-align: center; padding: 60px 20px; color: var(--text-faint); font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="site-nav">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span>Cinnacode</a>
+    <div class="nav-links">
+      <a href="index.html#features">Features</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <a href="#" class="nav-cta" id="logoutBtn" onclick="logout(); return false;">Log out</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <section class="legal-page">
+    <div class="dash-header">
+      <div>
+        <div class="section-label">// your account</div>
+        <h1 id="dashHeading">Dashboard</h1>
+      </div>
+      <a href="index.html#pricing" class="btn-primary">Buy more credits</a>
+    </div>
+
+    <div id="loadingState" class="loading-state">// loading your account...</div>
+
+    <div id="dashContent" style="display: none;">
+      <div class="dash-stats">
+        <div class="stat-card">
+          <div class="stat-label">Current balance</div>
+          <div class="stat-value accent" id="statBalance">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total credits used</div>
+          <div class="stat-value" id="statUsed">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cost per action</div>
+          <div class="stat-value" style="font-size: 15px; font-weight: 500;" id="statCosts">—</div>
+        </div>
+      </div>
+
+      <div class="section-label">// usage history</div>
+      <div id="historyContainer">
+        <table class="history-table" id="historyTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Balance after</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyHistory" style="display: none;">
+          No usage yet — your history will appear here once you start using Cinnacode.
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="brand"><span class="brand-mark">C</span>Cinnacode</div>
+      <div class="footer-links">
+        <a href="terms.html">Terms & Conditions</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="refund.html">Refund Policy</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>Cinnacode — an AI coding assistant</div>
+      <div>© 2026</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
+
+  const token = localStorage.getItem('cinnacode_token');
+
+  // No token at all — this page requires an account, send to registration
+  // (which also handles "returning user" login via the same email).
+  if (!token) {
+    window.location.href = 'register.html';
+  }
+
+  async function loadDashboard() {
+    try {
+      const [creditsRes, transactionsRes] = await Promise.all([
+        fetch(`${BACKEND_URL}/claude/credits`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`${BACKEND_URL}/claude/transactions`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+
+      if (creditsRes.status === 401 || transactionsRes.status === 401) {
+        // Token expired or invalid — clear it and send back to register/login
+        localStorage.removeItem('cinnacode_token');
+        window.location.href = 'register.html';
+        return;
+      }
+
+      if (!creditsRes.ok || !transactionsRes.ok) {
+        throw new Error('Could not load your account right now.');
+      }
+
+      const credits = await creditsRes.json();
+      const transactionsData = await transactionsRes.json();
+
+      document.getElementById('statBalance').textContent = credits.credits_balance.toLocaleString();
+      document.getElementById('statUsed').textContent = credits.credits_used_total.toLocaleString();
+      document.getElementById('statCosts').textContent =
+        `${credits.chat_cost} / chat · ${credits.completion_cost} / completion`;
+
+      const transactions = transactionsData.transactions || [];
+
+      if (transactions.length === 0) {
+        document.getElementById('emptyHistory').style.display = 'block';
+      } else {
+        const tbody = document.getElementById('historyBody');
+        transactions.forEach(t => {
+          const row = document.createElement('tr');
+          const date = new Date(t.created_at).toLocaleDateString('en-IN', {
+            year: 'numeric', month: 'short', day: 'numeric'
+          });
+          const amountClass = t.amount > 0 ? 'amount-positive' : 'amount-negative';
+          const amountText = t.amount > 0 ? `+${t.amount}` : `${t.amount}`;
+
+          row.innerHTML = `
+            <td>${date}</td>
+            <td style="text-transform: capitalize;">${t.type}</td>
+            <td>${t.description || '—'}</td>
+            <td class="${amountClass}">${amountText}</td>
+            <td class="mono">${t.balance_after}</td>
+          `;
+          tbody.appendChild(row);
+        });
+        document.getElementById('historyTable').style.display = 'table';
+      }
+
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('dashContent').style.display = 'block';
+
+    } catch (err) {
+      document.getElementById('loadingState').textContent = '// ' + (err.message || 'something went wrong loading your dashboard');
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('cinnacode_token');
+    window.location.href = 'index.html';
+  }
+
+  if (token) {
+    loadDashboard();
+  }
+</script>
+
+</body>
+</html>

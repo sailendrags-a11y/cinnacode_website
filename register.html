@@ -103,6 +103,12 @@
 <script>
   const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
 
+  // If this browser already has a saved session, skip the form entirely
+  // and go straight to the dashboard.
+  if (localStorage.getItem('cinnacode_token')) {
+    window.location.href = 'dashboard.html';
+  }
+
   document.getElementById('marketplaceLink').href =
     'https://marketplace.visualstudio.com/search?term=cinnacode&target=VSCode';
 

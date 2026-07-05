@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cinnacode — The AI coding assistant that bills like a utility, not a subscription</title>
+<title>Cinnacode — The AI coding assistant that helps you code faster, with simple, hassle-free pricing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -33,7 +33,7 @@
 <div class="wrap">
   <section class="hero">
     <div class="eyebrow">// pay for what you use</div>
-    <h1>An AI coding assistant that bills like a <span class="gradient-text">utility</span>, not a subscription.</h1>
+    <h1>The AI coding assistant that helps you code faster, with <span class="gradient-text">simple, hassle-free</span> pricing.</h1>
     <p>Cinnacode works directly inside VS Code — chat, inline fixes, and one-keystroke edits, powered by Claude. Buy credits once, spend them at your own pace. No monthly charge for weeks you don't code.</p>
     <div class="hero-actions">
       <a href="register.html" class="btn-primary">Create your account</a>
@@ -165,6 +165,7 @@
   const savedToken = localStorage.getItem('cinnacode_token');
   if (savedToken) {
     document.getElementById('navCta').textContent = 'My account';
+    document.getElementById('navCta').href = 'dashboard.html';
   }
 
   // ── Razorpay checkout flow ──────────────────────────────────────────────
