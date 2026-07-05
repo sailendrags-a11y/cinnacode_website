@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — Cinnacode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- Google Analytics (GA4) — codesail.in/cinnacode.com property -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8H9819QR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RJ8H9819QR');
+</script>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="site-nav">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span>Cinnacode</a>
+    <div class="nav-links">
+      <a href="index.html#features">Features</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <a href="register.html" class="nav-cta">Get started</a>
+  </nav>
+</div>
+
+<main class="form-main">
+  <div class="panel">
+    <div class="section-label">// log in</div>
+    <h1>Welcome back</h1>
+    <p class="sub">Enter the email you registered with to access your dashboard.</p>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" required>
+
+      <button type="submit" class="btn-primary" id="submitBtn" style="width: 100%;">Log in</button>
+    </form>
+
+    <p class="terms-note">New here? <a href="register.html">Create an account</a> instead.</p>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="brand"><span class="brand-mark">C</span>Cinnacode</div>
+      <div class="footer-links">
+        <a href="terms.html">Terms & Conditions</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="refund.html">Refund Policy</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>Cinnacode — an AI coding assistant</div>
+      <div>© 2026</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
+
+  // Already logged in on this browser — skip straight to the dashboard.
+  if (localStorage.getItem('cinnacode_token')) {
+    window.location.href = 'dashboard.html';
+  }
+
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('errorBox');
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Logging in...';
+
+    const email = document.getElementById('email').value.trim();
+
+    try {
+      // Note: this calls the same guest-register endpoint the signup page
+      // uses. If the email matches an existing account, the backend
+      // returns that account's existing token (a real login). If the
+      // email has never been used before, it will create a new guest
+      // account rather than reject the login — there's no separate
+      // "account not found" state in the current backend.
+      const response = await fetch(`${BACKEND_URL}/auth/guest/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: email.split('@')[0], email, country: 'India' })
+      });
+
+      if (!response.ok) {
+        throw new Error('Could not log in right now. Please try again.');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('cinnacode_token', data.access_token);
+      window.location.href = 'dashboard.html';
+
+    } catch (err) {
+      errorBox.textContent = err.message || 'Something went wrong. Please try again.';
+      errorBox.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Log in';
+    }
+  });
+</script>
+
+</body>
+</html>
