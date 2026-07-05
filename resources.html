@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docs & Resources — Cinnacode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<!-- Google Analytics (GA4) — Cinnacode property -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FKMWRY9R9C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FKMWRY9R9C');
+</script>
+<style>
+  .docs-layout { display: grid; grid-template-columns: 220px 1fr; gap: 56px; align-items: start; }
+  .docs-toc {
+    position: sticky; top: 24px;
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 20px 0; border-right: 1px solid var(--line);
+  }
+  .docs-toc a {
+    padding: 7px 16px 7px 0; font-size: 13px; color: var(--text-dim); border-left: 2px solid transparent;
+  }
+  .docs-toc a:hover { color: var(--text); text-decoration: none; }
+  .docs-section { padding-top: 60px; margin-top: -60px; margin-bottom: 64px; }
+  .docs-section:first-child { padding-top: 0; margin-top: 0; }
+  .docs-section h2 { font-size: 26px; margin-bottom: 8px; }
+  .docs-section .section-kicker { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent-solid); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .docs-section p { color: var(--text-dim); font-size: 15px; margin-bottom: 16px; max-width: 680px; }
+  .docs-section code { background: var(--panel); padding: 2px 7px; border-radius: 4px; color: var(--accent-solid); font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+  .docs-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 16px; }
+  .docs-card h3 { font-size: 16px; margin-bottom: 8px; }
+  .docs-card p { margin-bottom: 0; font-size: 14px; }
+  .cmd-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+  .cmd-table th { text-align: left; padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--line); }
+  .cmd-table td { padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--text-dim); }
+  .cmd-table td:first-child { color: var(--accent-solid); font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+  .video-placeholder {
+    border: 1.5px dashed var(--line); border-radius: 10px; padding: 48px 24px; text-align: center; color: var(--text-faint);
+  }
+  .faq-item { border-bottom: 1px solid var(--line); padding: 20px 0; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-item h3 { font-size: 15px; margin-bottom: 8px; }
+  .faq-item p { margin-bottom: 0; font-size: 14px; }
+  @media (max-width: 860px) {
+    .docs-layout { grid-template-columns: 1fr; }
+    .docs-toc { position: static; border-right: none; border-bottom: 1px solid var(--line); flex-direction: row; flex-wrap: wrap; gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="site-nav">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span>Cinnacode</a>
+    <div class="nav-links">
+      <a href="index.html#features">Features</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="resources.html">Docs</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <a href="login.html" class="nav-cta" id="loginNavBtn" style="background:transparent;border:1px solid var(--line);color:var(--text-dim);">Login</a>
+      <a href="register.html" class="nav-cta" id="navCta">Get started</a>
+    </div>
+  </nav>
+</div>
+
+<div class="wrap">
+  <section class="legal-page" style="padding-bottom: 20px;">
+    <div class="section-label">// documentation</div>
+    <h1>Docs & Resources</h1>
+    <p style="margin-top: 8px; max-width: 600px;">Everything you need to get the most out of Cinnacode — from your first install to advanced multi-file editing.</p>
+  </section>
+
+  <div class="docs-layout">
+    <div class="docs-toc">
+      <a href="#getting-started">Getting started</a>
+      <a href="#slash-commands">Slash commands</a>
+      <a href="#quick-edit">Cmd+K quick edit</a>
+      <a href="#diff-apply">Diff & Apply</a>
+      <a href="#file-mentions">@ File mentions</a>
+      <a href="#credits">Credits & billing</a>
+      <a href="#videos">Video tutorials</a>
+      <a href="#faq">FAQ</a>
+    </div>
+
+    <div>
+      <div class="docs-section" id="getting-started">
+        <div class="section-kicker">01</div>
+        <h2>Getting started</h2>
+        <p>You can create a Cinnacode account either from this website or directly inside the extension — both lead to the same place.</p>
+
+        <div class="docs-card">
+          <h3>1. Create your account</h3>
+          <p>Use <a href="register.html">Get started</a> on this site (guest signup, 200 free credits, no card needed), or install the extension first and it'll prompt you to register on first launch.</p>
+        </div>
+        <div class="docs-card">
+          <h3>2. Install the extension</h3>
+          <p>Search "Cinnacode" in the VS Code Marketplace, or use the <a href="dashboard.html">download link on your dashboard</a>.</p>
+        </div>
+        <div class="docs-card">
+          <h3>3. Log in from VS Code</h3>
+          <p>Open the Command Palette (<code>Cmd+Shift+P</code>), run <code>AI: Login with GitHub</code>, and paste the access key from your <a href="dashboard.html">dashboard</a> when prompted.</p>
+        </div>
+        <div class="docs-card">
+          <h3>4. Start chatting</h3>
+          <p>Open the Cinnacode icon in the Activity Bar, type a question in the sidebar, and press Enter.</p>
+        </div>
+      </div>
+
+      <div class="docs-section" id="slash-commands">
+        <div class="section-kicker">02</div>
+        <h2>Slash commands</h2>
+        <p>Type any of these at the start of a chat message to get a focused response, using whatever file you currently have open (or your current selection, if you have one) as context.</p>
+        <table class="cmd-table">
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td>/fix</td><td>Returns the complete corrected version of your file, plus a short list of what was fixed.</td></tr>
+            <tr><td>/explain</td><td>Explains what the code does, in plain terms.</td></tr>
+            <tr><td>/improve</td><td>Suggests improvements for readability, performance, and best practices.</td></tr>
+            <tr><td>/test</td><td>Writes unit tests covering the main functionality and edge cases.</td></tr>
+            <tr><td>/docs</td><td>Writes documentation or comments for the code.</td></tr>
+          </tbody>
+        </table>
+        <p>You can add extra instructions after the command, e.g. <code>/fix also handle empty arrays</code>.</p>
+      </div>
+
+      <div class="docs-section" id="quick-edit">
+        <div class="section-kicker">03</div>
+        <h2>Cmd+K quick edit</h2>
+        <p>The fastest way to change a specific piece of code without leaving your cursor position or opening the sidebar.</p>
+        <div class="docs-card">
+          <h3>How to use it</h3>
+          <p>1. Select the code you want to change.<br>
+          2. Press <code>Cmd+K</code> (Mac) or <code>Ctrl+K</code> (Windows/Linux).<br>
+          3. Type what you want changed, in plain English.<br>
+          4. A diff opens automatically showing the proposed change.<br>
+          5. Confirm to apply it to your file, or dismiss to cancel.</p>
+        </div>
+        <p>Cmd+K only activates when you have text selected — it won't interfere with the shortcut elsewhere in the editor.</p>
+      </div>
+
+      <div class="docs-section" id="diff-apply">
+        <div class="section-kicker">04</div>
+        <h2>Diff & Apply</h2>
+        <p>Every code suggestion — whether from chat or Cmd+K — goes through the same safety pattern: you always see the diff before anything touches your file.</p>
+        <div class="docs-card">
+          <h3>Show Diff</h3>
+          <p>Opens VS Code's native diff view comparing your current code against the suggestion.</p>
+        </div>
+        <div class="docs-card">
+          <h3>Apply</h3>
+          <p>Stays disabled until you've viewed the diff at least once. Clicking it shows one more confirmation dialog before writing the change to your file — nothing is ever applied silently.</p>
+        </div>
+      </div>
+
+      <div class="docs-section" id="file-mentions">
+        <div class="section-kicker">05</div>
+        <h2>@ File mentions</h2>
+        <p>Pull other files into a chat conversation, not just the one you have open.</p>
+        <div class="docs-card">
+          <h3>How to use it</h3>
+          <p>Type <code>@</code> followed by a few letters of a filename in the chat box. A dropdown shows matching files in your workspace — click one to attach it, then finish your question.</p>
+        </div>
+        <p>Mentioned files are read fresh each time you send a message, capped at a reasonable size per file to keep responses fast and affordable.</p>
+      </div>
+
+      <div class="docs-section" id="credits">
+        <div class="section-kicker">06</div>
+        <h2>Credits & billing</h2>
+        <p>Cinnacode uses prepaid credits instead of a subscription — buy once, spend at your own pace.</p>
+        <table class="cmd-table">
+          <thead><tr><th>Action</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td>Chat message</td><td>28 credits</td></tr>
+            <tr><td>Inline completion</td><td>6 credits</td></tr>
+            <tr><td>Guest signup bonus</td><td>200 free credits</td></tr>
+            <tr><td>Connecting GitHub</td><td>+100 credits</td></tr>
+          </tbody>
+        </table>
+        <p>Credits are valid for 9 months from purchase. See the full <a href="terms.html">Terms</a> and <a href="refund.html">Refund Policy</a> for details.</p>
+      </div>
+
+      <div class="docs-section" id="videos">
+        <div class="section-kicker">07</div>
+        <h2>Video tutorials</h2>
+        <div class="video-placeholder">
+          <p style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">// video walkthroughs coming soon</p>
+        </div>
+      </div>
+
+      <div class="docs-section" id="faq">
+        <div class="section-kicker">08</div>
+        <h2>Frequently asked questions</h2>
+
+        <div class="faq-item">
+          <h3>What happens when I run out of credits?</h3>
+          <p>You'll see a message in the chat panel with a link to buy more. If you're on a guest account, you'll also get a prompt to log in with GitHub for 100 more credits.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is my code sent anywhere?</h3>
+          <p>Code you're actively working with is sent to Anthropic's Claude API to generate a response — that's how the AI assistance works. We don't use your code to train any model, and we don't sell it. See our <a href="privacy.html">Privacy Policy</a> for full details.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can I use both a guest account and GitHub login?</h3>
+          <p>You can have both, but they're currently separate accounts with separate credit balances rather than one merged account. Logging in with GitHub from a guest session creates a new account rather than upgrading the existing one.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How do refunds work?</h3>
+          <p>Credits that were successfully delivered aren't refundable for change-of-mind, but genuine billing errors (double charges, failed delivery) are covered. See the full <a href="refund.html">Refund Policy</a>.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Something's not working — how do I get help?</h3>
+          <p>Run <code>AI: Send Feedback</code> from the Command Palette inside the extension, or reach out via the <a href="contact.html">Contact page</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="brand"><span class="brand-mark">C</span>Cinnacode</div>
+      <div class="footer-links">
+        <a href="terms.html">Terms & Conditions</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="refund.html">Refund Policy</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>Cinnacode — an AI coding assistant</div>
+      <div>© 2026</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const savedToken = localStorage.getItem('cinnacode_token');
+  if (savedToken) {
+    const navCta = document.getElementById('navCta');
+    const loginBtn = document.getElementById('loginNavBtn');
+    if (navCta) { navCta.textContent = 'My account'; navCta.href = 'dashboard.html'; }
+    if (loginBtn) { loginBtn.style.display = 'none'; }
+  }
+</script>
+
+</body>
+</html>

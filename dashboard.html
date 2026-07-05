@@ -42,6 +42,7 @@
     <div class="nav-links">
       <a href="index.html#features">Features</a>
       <a href="index.html#pricing">Pricing</a>
+      <a href="resources.html">Docs</a>
       <a href="contact.html">Contact</a>
     </div>
     <a href="#" class="nav-cta" id="logoutBtn" onclick="logout(); return false;">Log out</a>
@@ -85,9 +86,12 @@
         <div class="key-label">Use this to log in from VS Code</div>
         <div class="key-value" id="dashKeyValue">—</div>
         <button class="copy-btn" id="dashCopyBtn" onclick="copyDashKey()">Copy key</button>
-        <p style="font-size: 13px; color: var(--text-dim); margin-top: 14px; margin-bottom: 0;">
-          Install Cinnacode from the Marketplace, run <code class="mono">AI: Login with GitHub</code> from the command palette, and paste this key when prompted.
-        </p>
+        <ol class="steps" style="margin-top: 22px; margin-bottom: 0;">
+          <li>Install <strong>Cinnacode</strong> from the VS Code Marketplace.</li>
+          <li>Open the Command Palette: press <code>Cmd+Shift+P</code> (Mac) or <code>Ctrl+Shift+P</code> (Windows/Linux).</li>
+          <li>Type and select <code>AI: Login with GitHub</code>.</li>
+          <li>Paste the key above when prompted, then press Enter.</li>
+        </ol>
       </div>
 
       <div class="section-label">// usage history</div>

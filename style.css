@@ -229,7 +229,16 @@ input:focus, select:focus { outline: none; border-color: var(--accent-solid); }
   border-radius: 6px; display: flex; align-items: center; justify-content: center;
   font-family: 'IBM Plex Mono', monospace; font-size: 12px;
 }
-.steps code { background: var(--panel); padding: 2px 6px; border-radius: 4px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+.steps code {
+  background: var(--panel);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--accent-solid);
+  color: var(--accent-solid);
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
 .credits-badge { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent-solid); margin-bottom: 6px; }
 
 /* ── Contact page ─────────────────────────────────────────────────────── */
