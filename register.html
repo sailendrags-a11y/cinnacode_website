@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Analytics (GA4) — codesail.in/cinnacode.com property -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RJ8H9819QR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RJ8H9819QR');
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get started — Cinnacode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="site-nav">
+    <a href="index.html" class="brand"><span class="brand-mark">⛵</span>Cinnacode</a>
+    <div class="nav-links">
+      <a href="index.html#features">Features</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+</div>
+
+<main class="form-main">
+  <div class="panel" id="formPanel">
+    <div class="section-label">// crew registration</div>
+    <h1>Create your account</h1>
+    <p class="sub">200 free credits, no card required. Enough to properly try Cinnacode before you decide anything.</p>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <form id="registerForm">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Your name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" required>
+
+      <label for="country">Country</label>
+      <input type="text" id="country" placeholder="e.g. India" value="India" required>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="agreeTerms" required>
+        <label for="agreeTerms" style="text-transform: none; font-family: 'IBM Plex Sans', sans-serif; margin: 0;">
+          I have read and agree to the <a href="terms.html" target="_blank">Terms & Conditions</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>, including the sections on AI-generated code and limitation of liability.
+        </label>
+      </div>
+
+      <button type="submit" class="btn-primary" id="submitBtn" style="width: 100%;" disabled>Create account</button>
+    </form>
+
+    <p class="terms-note">Already registered? Use the same email to retrieve your existing access key.</p>
+  </div>
+
+  <div class="panel success-panel" id="successPanel">
+    <div class="seal-lg">✓</div>
+    <div class="section-label">// welcome aboard</div>
+    <h1 id="welcomeHeading">You're in.</h1>
+    <div class="credits-badge" id="creditsBadge"></div>
+
+    <div class="key-box">
+      <div class="key-label">Your access key</div>
+      <div class="key-value" id="keyValue">—</div>
+      <button class="copy-btn" id="copyBtn" onclick="copyKey()">Copy key</button>
+    </div>
+
+    <ol class="steps">
+      <li>Install <strong>Cinnacode</strong> from the VS Code Marketplace (search "Cinnacode", or use the link below).</li>
+      <li>Open the command palette (<code>Cmd+Shift+P</code>) and run <code>AI: Login with GitHub</code>.</li>
+      <li>Paste your access key above when prompted. You're ready to code.</li>
+    </ol>
+
+    <a href="#" class="btn-primary" id="marketplaceLink" style="display:block; text-align:center; width: 100%;">Download the extension</a>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="brand"><span class="brand-mark">⛵</span>Cinnacode</div>
+      <div class="footer-links">
+        <a href="terms.html">Terms & Conditions</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="refund.html">Refund Policy</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>Cinnacode — an AI coding assistant</div>
+      <div>© 2026</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
+
+  // TODO: update once the extension is actually published under the
+  // cinnacode publisher — search link used as a safe placeholder for now.
+  document.getElementById('marketplaceLink').href =
+    'https://marketplace.visualstudio.com/search?term=cinnacode&target=VSCode';
+
+  const form = document.getElementById('registerForm');
+  const errorBox = document.getElementById('errorBox');
+  const submitBtn = document.getElementById('submitBtn');
+  const agreeCheckbox = document.getElementById('agreeTerms');
+
+  // Submit stays disabled until the terms checkbox is explicitly checked —
+  // no way to register without acknowledging the liability terms.
+  agreeCheckbox.addEventListener('change', () => {
+    submitBtn.disabled = !agreeCheckbox.checked;
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!agreeCheckbox.checked) {
+      errorBox.textContent = 'You must agree to the Terms & Conditions and Privacy Policy to continue.';
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    errorBox.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating account...';
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const country = document.getElementById('country').value.trim();
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/auth/guest/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, country })
+      });
+
+      if (!response.ok) {
+        throw new Error('Registration failed. Please try again in a moment.');
+      }
+
+      const data = await response.json();
+
+      // Save the token so returning visits (and the pricing page's Buy
+      // buttons) recognize this browser without asking again.
+      localStorage.setItem('cinnacode_token', data.access_token);
+
+      showSuccess(name, data.access_token, data.credits);
+
+    } catch (err) {
+      errorBox.textContent = err.message || 'Something went wrong. Please try again.';
+      errorBox.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create account';
+    }
+  });
+
+  function showSuccess(name, accessToken, credits) {
+    document.getElementById('formPanel').style.display = 'none';
+    document.getElementById('successPanel').style.display = 'block';
+    document.getElementById('welcomeHeading').textContent = `Welcome aboard, ${name.split(' ')[0]}.`;
+    document.getElementById('keyValue').textContent = accessToken;
+    if (credits) {
+      document.getElementById('creditsBadge').textContent = `${credits} credits added to your account`;
+    }
+  }
+
+  function copyKey() {
+    const key = document.getElementById('keyValue').textContent;
+    navigator.clipboard.writeText(key);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy key';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+</script>
+
+</body>
+</html>
