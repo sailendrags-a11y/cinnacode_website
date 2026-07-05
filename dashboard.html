@@ -53,6 +53,7 @@
       <div>
         <div class="section-label">// your account</div>
         <h1 id="dashHeading">Dashboard</h1>
+        <p class="sub" id="loggedInAs" style="margin-top: 6px; margin-bottom: 0;"></p>
       </div>
       <a href="index.html#pricing" class="btn-primary">Buy more credits</a>
     </div>
@@ -119,6 +120,29 @@
   const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
 
   const token = localStorage.getItem('cinnacode_token');
+
+  // Decode the JWT payload (client-side, display only — not a security
+  // check, since real auth happens server-side on every API call). The
+  // token already carries "login" for every account type, and "name" for
+  // GitHub accounts specifically, so no extra API call is needed just to
+  // show who's logged in.
+  function decodeTokenPayload(jwt) {
+    try {
+      const payloadBase64 = jwt.split('.')[1];
+      const decoded = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
+  }
+
+  if (token) {
+    const payload = decodeTokenPayload(token);
+    if (payload) {
+      const displayName = payload.name || payload.login || 'your account';
+      document.getElementById('loggedInAs').textContent = `Logged in as ${displayName}`;
+    }
+  }
 
   // No token at all — this page requires an account, send to registration
   // (which also handles "returning user" login via the same email).
