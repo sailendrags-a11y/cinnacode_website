@@ -27,7 +27,7 @@
       <a href="contact.html">Contact</a>
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
-      <a href="login.html" class="nav-cta" style="background:transparent;border:1px solid var(--line);color:var(--text-dim);">Login</a>
+      <a href="login.html" class="nav-cta" id="loginNavBtn" style="background:transparent;border:1px solid var(--line);color:var(--text-dim);">Login</a>
       <a href="register.html" class="nav-cta">Get started</a>
     </div>
   </nav>
@@ -98,5 +98,21 @@
   </footer>
 </div>
 
+<script>
+  // Hide the Login button and relabel Get started -> My account when a
+  // session already exists in this browser.
+  const savedToken = localStorage.getItem('cinnacode_token');
+  if (savedToken) {
+    const navCta = document.querySelector('a[href="register.html"].nav-cta');
+    const loginBtn = document.getElementById('loginNavBtn');
+    if (navCta) {
+      navCta.textContent = 'My account';
+      navCta.href = 'dashboard.html';
+    }
+    if (loginBtn) {
+      loginBtn.style.display = 'none';
+    }
+  }
+</script>
 </body>
 </html>

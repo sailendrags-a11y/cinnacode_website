@@ -27,7 +27,7 @@
       <a href="#enterprise">Enterprise</a>
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
-      <a href="login.html" class="nav-cta" style="background:transparent;border:1px solid var(--line);color:var(--text-dim);">Login</a>
+      <a href="login.html" class="nav-cta" id="loginNavBtn" style="background:transparent;border:1px solid var(--line);color:var(--text-dim);">Login</a>
       <a href="register.html" class="nav-cta" id="navCta">Get started</a>
     </div>
   </nav>
@@ -169,6 +169,7 @@
   if (savedToken) {
     document.getElementById('navCta').textContent = 'My account';
     document.getElementById('navCta').href = 'dashboard.html';
+    document.getElementById('loginNavBtn').style.display = 'none';
   }
 
   // ── Razorpay checkout flow ──────────────────────────────────────────────
