@@ -58,6 +58,7 @@
         <p class="sub" id="loggedInAs" style="margin-top: 6px; margin-bottom: 0;"><strong style="color: var(--text); font-weight: 700;">Logged in as:</strong> <span id="loggedInName" style="color: var(--accent-solid); font-weight: 600;"></span></p>
       </div>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="admin.html" id="adminLink" class="btn-secondary" style="display: none;">Admin</a>
         <a href="https://marketplace.visualstudio.com/items?itemName=cinnacode.cinnacode" target="_blank" class="btn-secondary">Download extension</a>
         <a href="index.html#pricing" class="btn-primary">Buy more credits</a>
       </div>
@@ -159,6 +160,12 @@
     if (payload) {
       const displayName = payload.name || payload.login || 'your account';
       document.getElementById('loggedInName').textContent = displayName;
+
+      // Only admins ever see this link — regular users never get it,
+      // regardless of whether they know the admin.html URL exists.
+      if (payload.is_admin) {
+        document.getElementById('adminLink').style.display = 'inline-block';
+      }
     }
     // The key is just the raw token already sitting in localStorage — same
     // value shown once at registration, now always retrievable here too.
