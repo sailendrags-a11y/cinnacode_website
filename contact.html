@@ -48,13 +48,29 @@
         <div class="value"><a href="mailto:sailendrags@gmail.com">sailendrags@gmail.com</a></div>
       </div>
 
-      <div class="contact-card">
+      <div class="contact-card" style="grid-column: 1 / -1;">
         <div class="label">Feedback & feature requests</div>
-        <p>Run <code class="mono">AI: Send Feedback</code> from the Command Palette inside the extension, or email us directly.</p>
-        <div class="value"><a href="mailto:sailendrags@gmail.com?subject=Cinnacode%20Feedback">Send feedback →</a></div>
+        <p style="margin-bottom: 16px;">Run <code class="mono">AI: Send Feedback</code> from the Command Palette inside the extension, or leave a message here.</p>
+
+        <div class="error-box" id="feedbackError"></div>
+        <div id="feedbackSuccess" style="display:none; background: rgba(95,203,142,0.12); border: 1px solid var(--success); color: var(--success); padding: 13px 15px; border-radius: 7px; font-size: 14px; margin-bottom: 20px;">Thanks — your feedback has been recorded.</div>
+
+        <form id="feedbackForm">
+          <label for="feedbackType" style="text-transform: none; font-family: 'Inter', sans-serif; font-weight: 500; margin-bottom: 6px; display: block; font-size: 13px; color: var(--text-dim);">Type</label>
+          <select id="feedbackType" style="width: 100%; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text); font-size: 14px; margin-bottom: 14px;">
+            <option value="general">General feedback</option>
+            <option value="bug">Bug report</option>
+            <option value="feature_request">Feature request</option>
+          </select>
+
+          <label for="feedbackMessage" style="text-transform: none; font-family: 'Inter', sans-serif; font-weight: 500; margin-bottom: 6px; display: block; font-size: 13px; color: var(--text-dim);">Message</label>
+          <textarea id="feedbackMessage" rows="4" required placeholder="What's on your mind?" style="width: 100%; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text); font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 14px; resize: vertical;"></textarea>
+
+          <button type="submit" class="btn-primary" id="feedbackSubmitBtn">Send feedback</button>
+        </form>
       </div>
 
-      <div class="contact-card">
+      <div class="contact-card" style="grid-column: 1 / -1;">
         <div class="label">Enterprise & team plans</div>
         <p>Looking to bring Cinnacode to your team? Tell us your team size and needs.</p>
         <div class="value"><a href="mailto:sailendrags@gmail.com?subject=Cinnacode%20for%20Enterprise">Contact sales →</a></div>
@@ -106,5 +122,51 @@
     }
   }
 </script>
+<script>
+  const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
+
+  const feedbackForm = document.getElementById('feedbackForm');
+  const feedbackError = document.getElementById('feedbackError');
+  const feedbackSuccess = document.getElementById('feedbackSuccess');
+  const feedbackSubmitBtn = document.getElementById('feedbackSubmitBtn');
+
+  feedbackForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    feedbackError.style.display = 'none';
+    feedbackSuccess.style.display = 'none';
+    feedbackSubmitBtn.disabled = true;
+    feedbackSubmitBtn.textContent = 'Sending...';
+
+    const type = document.getElementById('feedbackType').value;
+    const message = document.getElementById('feedbackMessage').value.trim();
+
+    // Attach the visitor's token if they're logged in, so feedback can be
+    // linked to their account — but submission works fine without one too.
+    const token = localStorage.getItem('cinnacode_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/feedback`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ type, message })
+      });
+
+      if (!response.ok) throw new Error('Could not send feedback. Please try again.');
+
+      feedbackSuccess.style.display = 'block';
+      feedbackForm.reset();
+
+    } catch (err) {
+      feedbackError.textContent = err.message;
+      feedbackError.style.display = 'block';
+    } finally {
+      feedbackSubmitBtn.disabled = false;
+      feedbackSubmitBtn.textContent = 'Send feedback';
+    }
+  });
+</script>
+
 </body>
 </html>
