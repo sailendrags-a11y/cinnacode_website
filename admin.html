@@ -41,6 +41,17 @@
   .badge-active { background: rgba(95,203,142,0.15); color: var(--success); }
   .badge-suspended { background: rgba(240,101,74,0.15); color: var(--error); }
   .badge-admin { background: rgba(255,138,80,0.15); color: var(--accent-solid); margin-left: 6px; }
+  .badge-bug { background: rgba(240,101,74,0.15); color: var(--error); }
+  .badge-feature_request { background: rgba(95,168,255,0.15); color: var(--blue); }
+  .badge-general { background: rgba(155,161,168,0.15); color: var(--text-dim); }
+  .badge-open { background: rgba(255,138,80,0.15); color: var(--accent-solid); }
+  .badge-in_progress { background: rgba(95,168,255,0.15); color: var(--blue); }
+  .badge-resolved { background: rgba(95,203,142,0.15); color: var(--success); }
+  .feedback-message { max-width: 320px; white-space: normal; }
+  .status-select {
+    padding: 5px 10px; background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+    border-radius: 5px; font-size: 12px; cursor: pointer;
+  }
 
   .btn-action {
     padding: 6px 14px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; border: none;
@@ -84,10 +95,16 @@
   </section>
 
   <section class="legal-page" id="adminSection" style="display: none;">
-    <div class="section-label">// user management</div>
+    <div class="section-label">// admin</div>
     <h1>Admin</h1>
 
-    <div class="admin-stats" id="statsRow" style="margin-top: 32px;">
+    <div style="display: flex; gap: 10px; margin-top: 24px; margin-bottom: 8px;">
+      <button class="btn-filter" id="tabUsersBtn" onclick="switchTab('users')">Users</button>
+      <button class="btn-clear" id="tabFeedbackBtn" onclick="switchTab('feedback')">Feedback</button>
+    </div>
+
+    <div id="usersTab">
+    <div class="admin-stats" id="statsRow" style="margin-top: 24px;">
       <div class="stat-card"><div class="stat-label">Total users</div><div class="stat-value" id="statTotal">—</div></div>
       <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" id="statActive">—</div></div>
       <div class="stat-card"><div class="stat-label">Suspended</div><div class="stat-value" id="statSuspended">—</div></div>
@@ -144,6 +161,47 @@
         <button id="prevPageBtn" onclick="changePage(-1)">← Previous</button>
         <button id="nextPageBtn" onclick="changePage(1)">Next →</button>
       </div>
+    </div>
+    </div>
+
+    <div id="feedbackTab" style="display: none;">
+      <div class="filter-bar">
+        <div class="filter-field">
+          <label>Type</label>
+          <select id="filterFeedbackType">
+            <option value="">All</option>
+            <option value="bug">Errors</option>
+            <option value="feature_request">Feature Request</option>
+            <option value="general">Feedback</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label>Status</label>
+          <select id="filterFeedbackStatus">
+            <option value="">All</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+        <button class="btn-filter" onclick="loadFeedback()">Apply</button>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Message</th>
+            <th>From</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="feedbackTableBody">
+          <tr class="loading-row"><td colspan="6">// loading feedback...</td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 </div>
@@ -309,6 +367,92 @@
       });
       if (!response.ok) throw new Error('Could not activate user');
       loadUsers();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  function switchTab(tab) {
+    const usersTab = document.getElementById('usersTab');
+    const feedbackTab = document.getElementById('feedbackTab');
+    const usersBtn = document.getElementById('tabUsersBtn');
+    const feedbackBtn = document.getElementById('tabFeedbackBtn');
+
+    if (tab === 'users') {
+      usersTab.style.display = 'block';
+      feedbackTab.style.display = 'none';
+      usersBtn.className = 'btn-filter';
+      feedbackBtn.className = 'btn-clear';
+    } else {
+      usersTab.style.display = 'none';
+      feedbackTab.style.display = 'block';
+      usersBtn.className = 'btn-clear';
+      feedbackBtn.className = 'btn-filter';
+      loadFeedback();
+    }
+  }
+
+  const typeLabels = { bug: 'Errors', feature_request: 'Feature Request', general: 'Feedback' };
+  const statusLabels = { open: 'Open', in_progress: 'In progress', resolved: 'Resolved' };
+
+  async function loadFeedback() {
+    const tbody = document.getElementById('feedbackTableBody');
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="6">// loading feedback...</td></tr>';
+
+    const params = new URLSearchParams();
+    const type = document.getElementById('filterFeedbackType').value;
+    const status = document.getElementById('filterFeedbackStatus').value;
+    if (type) params.set('type', type);
+    if (status) params.set('status', status);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/feedback?${params.toString()}`, { headers: authHeaders() });
+      if (!response.ok) throw new Error('Could not load feedback');
+
+      const data = await response.json();
+
+      if (data.feedback.length === 0) {
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="6">No feedback matches these filters.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      data.feedback.forEach(f => {
+        const row = document.createElement('tr');
+        const date = f.created_at ? new Date(f.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+        const typeBadge = `<span class="badge badge-${f.type}">${typeLabels[f.type] || f.type}</span>`;
+        const submitter = f.submitter || 'Anonymous';
+
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${typeBadge}</td>
+          <td class="feedback-message">${f.message}</td>
+          <td>${submitter}</td>
+          <td><span class="badge badge-${f.status}">${statusLabels[f.status] || f.status}</span></td>
+          <td>
+            <select class="status-select" onchange="updateFeedbackStatus(${f.id}, this.value)">
+              <option value="open" ${f.status === 'open' ? 'selected' : ''}>Open</option>
+              <option value="in_progress" ${f.status === 'in_progress' ? 'selected' : ''}>In progress</option>
+              <option value="resolved" ${f.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+            </select>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+    } catch (err) {
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="6">// error: ${err.message}</td></tr>`;
+    }
+  }
+
+  async function updateFeedbackStatus(feedbackId, newStatus) {
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/feedback/${feedbackId}/status?status=${newStatus}`, {
+        method: 'POST',
+        headers: authHeaders()
+      });
+      if (!response.ok) throw new Error('Could not update status');
+      loadFeedback();
     } catch (err) {
       alert(err.message);
     }
