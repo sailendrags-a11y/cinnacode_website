@@ -115,6 +115,7 @@
     <div style="display: flex; gap: 10px; margin-top: 24px; margin-bottom: 8px;">
       <button class="btn-filter" id="tabUsersBtn" onclick="switchTab('users')">Users</button>
       <button class="btn-clear" id="tabFeedbackBtn" onclick="switchTab('feedback')">Feedback</button>
+      <button class="btn-clear" id="tabAddUserBtn" onclick="switchTab('adduser')">Add User</button>
     </div>
 
     <div id="usersTab">
@@ -216,6 +217,38 @@
           <tr class="loading-row"><td colspan="6">// loading feedback...</td></tr>
         </tbody>
       </table>
+    </div>
+
+    <div id="adduserTab" style="display: none; max-width: 480px;">
+      <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 24px;">
+        Creates a guest-style account for someone who reached out directly. This can't create a real GitHub-linked account — that requires the person to log in with GitHub themselves. You'll get an access key here to share with them manually.
+      </p>
+
+      <div class="error-box" id="addUserError"></div>
+
+      <form id="addUserForm">
+        <label for="addUserName" style="display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;">Name</label>
+        <input type="text" id="addUserName" required style="width:100%; padding:10px 12px; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--text); font-size:14px; margin-bottom:14px;">
+
+        <label for="addUserEmail" style="display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;">Email</label>
+        <input type="email" id="addUserEmail" required style="width:100%; padding:10px 12px; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--text); font-size:14px; margin-bottom:14px;">
+
+        <label for="addUserCountry" style="display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;">Country</label>
+        <input type="text" id="addUserCountry" value="India" style="width:100%; padding:10px 12px; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--text); font-size:14px; margin-bottom:14px;">
+
+        <label for="addUserCredits" style="display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;">Initial credits</label>
+        <input type="number" id="addUserCredits" value="200" style="width:100%; padding:10px 12px; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--text); font-size:14px; margin-bottom:20px;">
+
+        <button type="submit" class="btn-filter" id="addUserSubmitBtn" style="width:100%; padding:12px;">Create account</button>
+      </form>
+
+      <div id="addUserResult" style="display:none; margin-top:24px;">
+        <div class="key-box">
+          <div class="key-label">Access key — share this with them</div>
+          <div class="key-value" id="addUserKeyValue">—</div>
+          <button class="copy-btn" id="addUserCopyBtn" onclick="copyAddUserKey()">Copy key</button>
+        </div>
+      </div>
     </div>
   </section>
 </div>
@@ -389,20 +422,28 @@
   function switchTab(tab) {
     const usersTab = document.getElementById('usersTab');
     const feedbackTab = document.getElementById('feedbackTab');
+    const adduserTab = document.getElementById('adduserTab');
     const usersBtn = document.getElementById('tabUsersBtn');
     const feedbackBtn = document.getElementById('tabFeedbackBtn');
+    const adduserBtn = document.getElementById('tabAddUserBtn');
+
+    usersTab.style.display = 'none';
+    feedbackTab.style.display = 'none';
+    adduserTab.style.display = 'none';
+    usersBtn.className = 'btn-clear';
+    feedbackBtn.className = 'btn-clear';
+    adduserBtn.className = 'btn-clear';
 
     if (tab === 'users') {
       usersTab.style.display = 'block';
-      feedbackTab.style.display = 'none';
       usersBtn.className = 'btn-filter';
-      feedbackBtn.className = 'btn-clear';
-    } else {
-      usersTab.style.display = 'none';
+    } else if (tab === 'feedback') {
       feedbackTab.style.display = 'block';
-      usersBtn.className = 'btn-clear';
       feedbackBtn.className = 'btn-filter';
       loadFeedback();
+    } else if (tab === 'adduser') {
+      adduserTab.style.display = 'block';
+      adduserBtn.className = 'btn-filter';
     }
   }
 
@@ -470,6 +511,61 @@
     } catch (err) {
       alert(err.message);
     }
+  }
+
+  const addUserForm = document.getElementById('addUserForm');
+  const addUserError = document.getElementById('addUserError');
+  const addUserSubmitBtn = document.getElementById('addUserSubmitBtn');
+
+  addUserForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    addUserError.style.display = 'none';
+    document.getElementById('addUserResult').style.display = 'none';
+    addUserSubmitBtn.disabled = true;
+    addUserSubmitBtn.textContent = 'Creating...';
+
+    const payload = {
+      name: document.getElementById('addUserName').value.trim(),
+      email: document.getElementById('addUserEmail').value.trim(),
+      country: document.getElementById('addUserCountry').value.trim() || 'India',
+      initial_credits: parseInt(document.getElementById('addUserCredits').value) || 200
+    };
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/users/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Could not create account');
+      }
+
+      const data = await response.json();
+      document.getElementById('addUserKeyValue').textContent = data.access_token;
+      document.getElementById('addUserResult').style.display = 'block';
+      addUserForm.reset();
+      document.getElementById('addUserCountry').value = 'India';
+      document.getElementById('addUserCredits').value = 200;
+
+    } catch (err) {
+      addUserError.textContent = err.message;
+      addUserError.style.display = 'block';
+    } finally {
+      addUserSubmitBtn.disabled = false;
+      addUserSubmitBtn.textContent = 'Create account';
+    }
+  });
+
+  function copyAddUserKey() {
+    const key = document.getElementById('addUserKeyValue').textContent;
+    navigator.clipboard.writeText(key);
+    const btn = document.getElementById('addUserCopyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy key'; btn.classList.remove('copied'); }, 2000);
   }
 
   init();
