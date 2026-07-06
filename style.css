@@ -129,7 +129,7 @@ nav.site-nav {
 .pricing h2 { font-size: 34px; max-width: 560px; }
 .pricing > .wrap > p.lead { color: var(--text-dim); max-width: 520px; margin-top: 14px; margin-bottom: 50px; }
 
-.price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.price-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .price-card {
   background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 32px;
   display: flex; flex-direction: column;
@@ -249,10 +249,11 @@ input:focus, select:focus { outline: none; border-color: var(--accent-solid); }
 .contact-card .value { color: var(--text); font-size: 16px; font-weight: 600; }
 
 /* ── Responsive ───────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .price-grid { grid-template-columns: 1fr; }
+@media (max-width: 1100px) {
+  .price-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 720px) {
+  .price-grid { grid-template-columns: 1fr; }
   .hero h1 { font-size: 38px; }
   .feature-grid { grid-template-columns: 1fr; }
   .nav-links { display: none; }
