@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /admin.html
+Disallow: /auth-callback.html
+
+Sitemap: https://cinnacode.in/sitemap.xml
