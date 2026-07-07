@@ -78,26 +78,13 @@
     <p class="terms-note">Already have an account? <a href="login.html">Log in</a> instead.</p>
   </div>
 
-  <div class="panel success-panel" id="successPanel">
-    <div class="success-icon">✓</div>
+  <div class="panel success-panel" id="successPanel" style="text-align: center;">
+    <div class="success-icon" style="margin-left: auto; margin-right: auto;">✓</div>
     <div class="section-label">// account created</div>
     <h1 id="welcomeHeading">You're set up.</h1>
     <div class="credits-badge" id="creditsBadge"></div>
-
-    <div class="key-box">
-      <div class="key-label">Your access key</div>
-      <div class="key-value" id="keyValue">—</div>
-      <button class="copy-btn" id="copyBtn" onclick="copyKey()">Copy key</button>
-    </div>
-
-    <ol class="steps">
-      <li>Install <strong>Cinnacode</strong> from the VS Code Marketplace (search "Cinnacode", or use the link below).</li>
-      <li>Open the Command Palette: press <code>Cmd+Shift+P</code> (Mac) or <code>Ctrl+Shift+P</code> (Windows/Linux).</li>
-      <li>Type and select <code>AI: Login with GitHub</code>.</li>
-      <li>Paste your access key above when prompted. You're ready to code.</li>
-    </ol>
-
-    <a href="#" class="btn-primary" id="marketplaceLink" target="_blank" style="display:block; text-align:center; width: 100%;">Download the extension</a>
+    <p class="sub" style="margin-top: 16px;">Taking you to your dashboard...</p>
+  </div>
   </div>
 </main>
 
@@ -127,9 +114,6 @@
   if (localStorage.getItem('cinnacode_token')) {
     window.location.href = 'dashboard.html';
   }
-
-  document.getElementById('marketplaceLink').href =
-    'https://marketplace.visualstudio.com/items?itemName=cinnacode.cinnacode';
 
   const form = document.getElementById('registerForm');
   const errorBox = document.getElementById('errorBox');
@@ -186,22 +170,15 @@
     document.getElementById('formPanel').style.display = 'none';
     document.getElementById('successPanel').style.display = 'block';
     document.getElementById('welcomeHeading').textContent = `Welcome, ${name.split(' ')[0]}.`;
-    document.getElementById('keyValue').textContent = accessToken;
     if (credits) {
       document.getElementById('creditsBadge').textContent = `${credits} credits added to your account`;
     }
-  }
-
-  function copyKey() {
-    const key = document.getElementById('keyValue').textContent;
-    navigator.clipboard.writeText(key);
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
+    // Brief confirmation, then straight to the dashboard — which already
+    // has the access key, install steps, and everything else needed.
+    // Showing all of that a second time here would just be duplicated UI.
     setTimeout(() => {
-      btn.textContent = 'Copy key';
-      btn.classList.remove('copied');
-    }, 2000);
+      window.location.href = 'dashboard.html';
+    }, 1800);
   }
 </script>
 
