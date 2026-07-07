@@ -108,7 +108,7 @@
 
 <script>
   const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
-  const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
+  const RECAPTCHA_SITE_KEY = '6LcRTkgtAAAAACdJFKQXh4_v0xNG-CuQnq10ZK-5';
 
   // If the extension's "Continue as Guest" opened this page, it appends
   // ?source=vscode — this tells us to redirect back into VS Code
@@ -155,13 +155,27 @@
     try {
       // Get a fresh reCAPTCHA v3 token right before submitting — tokens
       // are short-lived and tied to this specific action.
-      const recaptchaToken = await new Promise((resolve, reject) => {
+      //
+      // Wrapped with a timeout: some browsers (notably Safari Private
+      // Browsing, and strict tracking-prevention settings generally)
+      // silently block the underlying request to Google's reCAPTCHA
+      // service, which would otherwise leave this hanging forever on
+      // "Verifying..." with no way out for the user.
+      const recaptchaPromise = new Promise((resolve, reject) => {
         grecaptcha.ready(() => {
           grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'register' })
             .then(resolve)
             .catch(reject);
         });
       });
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error(
+          'Verification is taking too long. If you\'re using Private Browsing or strict tracking protection, please try a regular browser window.'
+        )), 8000);
+      });
+
+      const recaptchaToken = await Promise.race([recaptchaPromise, timeoutPromise]);
 
       submitBtn.textContent = 'Creating account...';
 
