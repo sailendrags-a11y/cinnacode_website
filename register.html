@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://www.google.com/recaptcha/api.js?render=6LcRTkgtAAAAACdJFKQXh4_v0xNG-CuQnq10ZK-5"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Sign up for Cinnacode and get 200 free credits, no card required. Start using AI-powered coding assistance in VS Code today.">
@@ -85,7 +86,6 @@
     <div class="credits-badge" id="creditsBadge"></div>
     <p class="sub" style="margin-top: 16px;">Taking you to your dashboard...</p>
   </div>
-  </div>
 </main>
 
 <div class="wrap">
@@ -108,10 +108,20 @@
 
 <script>
   const BACKEND_URL = 'https://sail-backend-production-154d.up.railway.app';
+  const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
+
+  // If the extension's "Continue as Guest" opened this page, it appends
+  // ?source=vscode — this tells us to redirect back into VS Code
+  // automatically after successful registration, the same way the GitHub
+  // login flow already does, instead of going to dashboard.html.
+  const urlParams = new URLSearchParams(window.location.search);
+  const isFromExtension = urlParams.get('source') === 'vscode';
 
   // If this browser already has a saved session, skip the form entirely
-  // and go straight to the dashboard.
-  if (localStorage.getItem('cinnacode_token')) {
+  // and go straight to the dashboard — but not if this came from the
+  // extension, since that flow needs a *fresh* signup, not a redirect
+  // into an unrelated existing browser session.
+  if (localStorage.getItem('cinnacode_token') && !isFromExtension) {
     window.location.href = 'dashboard.html';
   }
 
@@ -135,7 +145,7 @@
 
     errorBox.style.display = 'none';
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating account...';
+    submitBtn.textContent = 'Verifying...';
 
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -143,10 +153,22 @@
     const country = document.getElementById('country').value.trim();
 
     try {
+      // Get a fresh reCAPTCHA v3 token right before submitting — tokens
+      // are short-lived and tied to this specific action.
+      const recaptchaToken = await new Promise((resolve, reject) => {
+        grecaptcha.ready(() => {
+          grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'register' })
+            .then(resolve)
+            .catch(reject);
+        });
+      });
+
+      submitBtn.textContent = 'Creating account...';
+
       const response = await fetch(`${BACKEND_URL}/auth/guest/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, country })
+        body: JSON.stringify({ name, email, password, country, recaptcha_token: recaptchaToken })
       });
 
       if (!response.ok) {
@@ -173,6 +195,15 @@
     if (credits) {
       document.getElementById('creditsBadge').textContent = `${credits} credits added to your account`;
     }
+
+    if (isFromExtension) {
+      document.querySelector('#successPanel .sub').textContent = 'Taking you back to VS Code...';
+      setTimeout(() => {
+        window.location.href = `vscode://cinnacode.cinnacode/auth-callback?token=${accessToken}`;
+      }, 1500);
+      return;
+    }
+
     // Brief confirmation, then straight to the dashboard — which already
     // has the access key, install steps, and everything else needed.
     // Showing all of that a second time here would just be duplicated UI.
