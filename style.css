@@ -104,6 +104,20 @@ nav.site-nav {
 .btn-outline:hover { background: rgba(95,168,255,0.1); text-decoration: none; }
 
 /* ── Ticker ───────────────────────────────────────────────────────────── */
+.hero-free-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(100deg, rgba(255,122,69,0.15), rgba(255,193,69,0.15));
+  border: 1px solid var(--accent-solid);
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-solid);
+  margin-bottom: 22px;
+}
 .ticker {
   display: flex; gap: 40px; padding: 18px 0; border-bottom: 1px solid var(--line);
   font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text-dim); flex-wrap: wrap;
