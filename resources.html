@@ -137,7 +137,9 @@
             <tr><td>/fix</td><td>Returns the complete corrected version of your file, plus a short list of what was fixed.</td></tr>
             <tr><td>/explain</td><td>Explains what the code does, in plain terms.</td></tr>
             <tr><td>/improve</td><td>Suggests improvements for readability, performance, and best practices.</td></tr>
-            <tr><td>/test</td><td>Writes unit tests covering the main functionality and edge cases.</td></tr>
+            <tr><td>/test</td><td>Writes unit tests covering the main functionality and edge cases. Automatically detects your project's test framework (Jest, Pytest, JUnit, etc.).</td></tr>
+            <tr><td>/edge-cases</td><td>Goes deeper than /test — specifically hunts for boundary values, empty/null inputs, and adversarial scenarios most people forget to test.</td></tr>
+            <tr><td>/coverage</td><td>Compares your source code against its existing test file and tells you specifically what's not covered yet.</td></tr>
             <tr><td>/docs</td><td>Writes documentation or comments for the code.</td></tr>
           </tbody>
         </table>
