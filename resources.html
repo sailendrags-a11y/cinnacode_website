@@ -143,9 +143,18 @@
             <tr><td>/edge-cases</td><td>Goes deeper than /test — specifically hunts for boundary values, empty/null inputs, and adversarial scenarios most people forget to test.</td></tr>
             <tr><td>/coverage</td><td>Compares your source code against its existing test file and tells you specifically what's not covered yet.</td></tr>
             <tr><td>/docs</td><td>Writes documentation or comments for the code.</td></tr>
+            <tr><td>/find-usage</td><td>Real, mechanical search — finds every exact place a function or variable is used across your whole project, not a guess.</td></tr>
+            <tr><td>/review</td><td>Reviews your current uncommitted git changes before you commit — checks for bugs, consistency, and leftover debug code.</td></tr>
+            <tr><td>/readme</td><td>Generates a README.md for your project based on its actual structure.</td></tr>
+            <tr><td>/changelog</td><td>Generates a changelog entry from your recent commit history.</td></tr>
           </tbody>
         </table>
         <p>You can add extra instructions after the command, e.g. <code>/fix also handle empty arrays</code>.</p>
+
+        <div class="docs-card" style="margin-top: 24px;">
+          <h3>Automatic file discovery</h3>
+          <p>When Claude mentions a real file in your project by name — even one you never opened or @ mentioned — a small button appears letting you pull in its actual content with one click, instead of typing <code>@filename</code> yourself. If several files are mentioned at once (common for broader "how does X work" questions), you can attach all of them together in a single follow-up.</p>
+        </div>
       </div>
 
       <div class="docs-section" id="quick-edit">
@@ -183,7 +192,7 @@
         <p>Pull other files into a chat conversation, not just the one you have open.</p>
         <div class="docs-card">
           <h3>How to use it</h3>
-          <p>Type <code>@</code> followed by a few letters of a filename in the chat box. A dropdown shows matching files in your workspace — click one to attach it, then finish your question.</p>
+          <p>Type <code>@</code> followed by a few letters of a filename in the chat box — this searches your entire workspace live, not just files you've already opened, and shows matching results in a dropdown. Click one to attach it, then finish your question.</p>
         </div>
         <p>Mentioned files are read fresh each time you send a message, capped at a reasonable size per file to keep responses fast and affordable.</p>
       </div>
@@ -252,6 +261,10 @@
         <div class="faq-item">
           <h3>Can I use both a guest account and GitHub login?</h3>
           <p>You can have both, but they're currently separate accounts with separate credit balances rather than one merged account. Logging in with GitHub from a guest session creates a new account rather than upgrading the existing one.</p>
+        </div>
+        <div class="faq-item">
+          <h3>I forgot my password — how do I get back in?</h3>
+          <p>If you registered with an email and password (not GitHub), go to <a href="login.html">login.html</a> and click "Forgot password?" — you'll get a reset link by email, valid for 30 minutes. GitHub-linked accounts don't need this; just log in with GitHub again.</p>
         </div>
         <div class="faq-item">
           <h3>How do refunds work?</h3>
