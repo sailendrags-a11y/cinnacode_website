@@ -249,6 +249,29 @@
           <button class="copy-btn" id="addUserCopyBtn" onclick="copyAddUserKey()">Copy key</button>
         </div>
       </div>
+
+      <hr style="border-color: var(--line); margin: 36px 0;">
+
+      <h3 style="font-size: 16px; margin-bottom: 8px;">Reissue key for existing account</h3>
+      <p style="color: var(--text-dim); font-size: 13px; margin-bottom: 20px;">
+        For guest accounts that lost their access key. Only use this after verifying their identity yourself (e.g. replying to the email they signed up with) — this hands out access to whatever account matches the email below.
+      </p>
+
+      <div class="error-box" id="reissueError"></div>
+
+      <form id="reissueForm">
+        <label for="reissueEmail" style="display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;">Account email</label>
+        <input type="email" id="reissueEmail" required style="width:100%; padding:10px 12px; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--text); font-size:14px; margin-bottom:14px;">
+        <button type="submit" class="btn-clear" id="reissueSubmitBtn" style="width:100%; padding:12px;">Find account & reissue key</button>
+      </form>
+
+      <div id="reissueResult" style="display:none; margin-top:24px;">
+        <div class="key-box">
+          <div class="key-label">New access key</div>
+          <div class="key-value" id="reissueKeyValue">—</div>
+          <button class="copy-btn" id="reissueCopyBtn" onclick="copyReissueKey()">Copy key</button>
+        </div>
+      </div>
     </div>
   </section>
 </div>
@@ -563,6 +586,54 @@
     const key = document.getElementById('addUserKeyValue').textContent;
     navigator.clipboard.writeText(key);
     const btn = document.getElementById('addUserCopyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy key'; btn.classList.remove('copied'); }, 2000);
+  }
+
+  const reissueForm = document.getElementById('reissueForm');
+  const reissueError = document.getElementById('reissueError');
+  const reissueSubmitBtn = document.getElementById('reissueSubmitBtn');
+
+  reissueForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    reissueError.style.display = 'none';
+    document.getElementById('reissueResult').style.display = 'none';
+    reissueSubmitBtn.disabled = true;
+    reissueSubmitBtn.textContent = 'Looking up...';
+
+    const email = document.getElementById('reissueEmail').value.trim();
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/users/reissue-key`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify({ email })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Could not find or reissue key for this account');
+      }
+
+      const data = await response.json();
+      document.getElementById('reissueKeyValue').textContent = data.access_token;
+      document.getElementById('reissueResult').style.display = 'block';
+      reissueForm.reset();
+
+    } catch (err) {
+      reissueError.textContent = err.message;
+      reissueError.style.display = 'block';
+    } finally {
+      reissueSubmitBtn.disabled = false;
+      reissueSubmitBtn.textContent = 'Find account & reissue key';
+    }
+  });
+
+  function copyReissueKey() {
+    const key = document.getElementById('reissueKeyValue').textContent;
+    navigator.clipboard.writeText(key);
+    const btn = document.getElementById('reissueCopyBtn');
     btn.textContent = 'Copied!';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'Copy key'; btn.classList.remove('copied'); }, 2000);
