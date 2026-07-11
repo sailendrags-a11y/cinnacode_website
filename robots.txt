@@ -3,5 +3,7 @@ Allow: /
 Disallow: /dashboard.html
 Disallow: /admin.html
 Disallow: /auth-callback.html
+Disallow: /forgot-password.html
+Disallow: /reset-password.html
 
 Sitemap: https://cinnacode.in/sitemap.xml
