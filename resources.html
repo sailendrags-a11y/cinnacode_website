@@ -101,6 +101,7 @@
     <div class="docs-toc">
       <a href="best-ai-coding-tools.html" style="color: var(--accent-solid);">Tool comparison ↗</a>
       <a href="#getting-started">Getting started</a>
+      <a href="#agent-mode">Agent Mode</a>
       <a href="#slash-commands">Slash commands</a>
       <a href="#quick-edit">Cmd+K quick edit</a>
       <a href="#diff-apply">Diff & Apply</a>
@@ -136,8 +137,27 @@
         </div>
       </div>
 
-      <div class="docs-section" id="slash-commands">
+      <div class="docs-section" id="agent-mode">
         <div class="section-kicker">02</div>
+        <h2>Agent Mode</h2>
+        <p>For multi-step tasks — "add error handling to every route in this file," "write tests for this module" — Agent Mode plans the work, then writes files and runs commands to get it done, one approved step at a time.</p>
+        <div class="docs-card">
+          <h3>How to use it</h3>
+          <p>1. Open the Command Palette (<code>Cmd+Shift+P</code>) and run <code>AI: Start Agent Task</code>.<br>
+          2. Describe what you want done, in plain English.<br>
+          3. Cinnacode proposes a plan and the first step — review it.<br>
+          4. Approve each file write or command individually; nothing runs without your sign-off.<br>
+          5. The task continues step by step until it's done, or you click Stop Task.</p>
+        </div>
+        <div class="docs-card">
+          <h3>⚠️ Review every action carefully</h3>
+          <p>Agent Mode can write files and run commands on your machine. Approving an action means you've reviewed it — not that Cinnacode has verified it's safe or correct. Read each proposed step before approving it, the same way you'd review a diff before merging it.</p>
+        </div>
+        <p>Choose a model tier (Fast / Balanced / Capable) right in the Agent Mode panel — the same tradeoff as sidebar chat's model selection, scoped to this task.</p>
+      </div>
+
+      <div class="docs-section" id="slash-commands">
+        <div class="section-kicker">03</div>
         <h2>Slash commands</h2>
         <p>Type any of these at the start of a chat message to get a focused response, using whatever file you currently have open (or your current selection, if you have one) as context.</p>
         <table class="cmd-table">
@@ -165,7 +185,7 @@
       </div>
 
       <div class="docs-section" id="quick-edit">
-        <div class="section-kicker">03</div>
+        <div class="section-kicker">04</div>
         <h2>Cmd+K quick edit</h2>
         <p>The fastest way to change a specific piece of code without leaving your cursor position or opening the sidebar.</p>
         <div class="docs-card">
@@ -180,7 +200,7 @@
       </div>
 
       <div class="docs-section" id="diff-apply">
-        <div class="section-kicker">04</div>
+        <div class="section-kicker">05</div>
         <h2>Diff & Apply</h2>
         <p>Every code suggestion — whether from chat or Cmd+K — goes through the same safety pattern: you always see the diff before anything touches your file.</p>
         <div class="docs-card">
@@ -194,7 +214,7 @@
       </div>
 
       <div class="docs-section" id="file-mentions">
-        <div class="section-kicker">05</div>
+        <div class="section-kicker">06</div>
         <h2>@ File mentions</h2>
         <p>Pull other files into a chat conversation, not just the one you have open.</p>
         <div class="docs-card">
@@ -205,7 +225,7 @@
       </div>
 
       <div class="docs-section" id="document-upload">
-        <div class="section-kicker">06</div>
+        <div class="section-kicker">07</div>
         <h2>Document upload</h2>
         <p>Attach a document — a requirements doc, a spec, anything text-based — and ask Cinnacode to work from it.</p>
         <div class="docs-card">
@@ -216,7 +236,7 @@
       </div>
 
       <div class="docs-section" id="model-selection">
-        <div class="section-kicker">07</div>
+        <div class="section-kicker">08</div>
         <h2>Model selection</h2>
         <p>Choose the right balance of speed and capability for what you're working on, right from the chat panel.</p>
         <table class="cmd-table">
@@ -231,7 +251,7 @@
       </div>
 
       <div class="docs-section" id="credits">
-        <div class="section-kicker">08</div>
+        <div class="section-kicker">09</div>
         <h2>Credits & billing</h2>
         <p>Cinnacode uses prepaid credits instead of a subscription — buy once, spend at your own pace.</p>
         <table class="cmd-table">
@@ -246,7 +266,7 @@
       </div>
 
       <div class="docs-section" id="videos">
-        <div class="section-kicker">09</div>
+        <div class="section-kicker">10</div>
         <h2>Video tutorials</h2>
         <div class="video-placeholder">
           <p style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">// video walkthroughs coming soon</p>
@@ -254,7 +274,7 @@
       </div>
 
       <div class="docs-section" id="faq">
-        <div class="section-kicker">10</div>
+        <div class="section-kicker">11</div>
         <h2>Frequently asked questions</h2>
 
         <div class="faq-item">
